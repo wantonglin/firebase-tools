@@ -14,6 +14,11 @@ export enum PLATFORM_PATH {
   IOS = "topAppleDevices",
 }
 
+export type CrashlyticsAppPlatform = "android" | "ios" | "web";
+
+/**
+ * Extracts the project number from a Firebase App ID.
+ */
 export function parseProjectNumber(appId: string): string {
   const appIdParts = appId.split(":");
   if (appIdParts.length > 1) {
@@ -22,6 +27,24 @@ export function parseProjectNumber(appId: string): string {
   throw new FirebaseError("Unable to get the projectId from the AppId.");
 }
 
+/**
+ * Extracts the platform segment ("android", "ios", or "web") from a Firebase App ID,
+ * or returns undefined if the App ID does not match a known Crashlytics platform.
+ */
+export function getAppPlatform(appId?: string): CrashlyticsAppPlatform | undefined {
+  if (!appId) {
+    return undefined;
+  }
+  const platform = appId.split(":")[2]?.toLowerCase();
+  if (platform === "android" || platform === "ios" || platform === "web") {
+    return platform;
+  }
+  return undefined;
+}
+
+/**
+ * Maps a mobile Firebase App ID to its platform-specific top devices report path.
+ */
 export function parsePlatform(appId: string): PLATFORM_PATH {
   const appIdParts = appId.split(":");
   if (appIdParts.length < 3) {
