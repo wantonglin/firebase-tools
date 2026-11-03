@@ -7,6 +7,7 @@ import {
   ApplicationIdSchema,
   EventFilter,
   EventFilterSchema,
+  FilterExpressionSchema,
   filterToUrlSearchParams,
 } from "./filters";
 import { FirebaseError } from "../error";
@@ -26,6 +27,9 @@ export const ReportInputSchema = z.object({
   appId: ApplicationIdSchema,
   report: CrashlyticsReportSchema,
   filter: EventFilterSchema,
+  filterExpression: FilterExpressionSchema.describe(
+    `An AIP-160 filter expression for custom keys (e.g. 'custom_keys.env = "prod"'). Only supported for web apps, on all reports except topIssues.`,
+  ),
   pageSize: z.number().optional().describe("Number of rows to return").default(DEFAULT_PAGE_SIZE),
   granularity: TimeGranularitySchema,
 });
@@ -93,6 +97,7 @@ export async function getReport(
   filter: EventFilter,
   pageSize = DEFAULT_PAGE_SIZE,
   granularity?: TimeGranularity,
+  filterExpression?: string,
 ): Promise<Report> {
   const requestProjectNumber = parseProjectNumber(appId);
   let availableReports = reportsCache.get(appId);
@@ -121,6 +126,9 @@ export async function getReport(
   queryParams.set("page_size", `${pageSize}`);
   if (granularity) {
     queryParams.set("granularity", granularity);
+  }
+  if (filterExpression) {
+    queryParams.set("filter_expression", filterExpression);
   }
   logger.debug(
     `[crashlytics] report ${reportName} called with appId: ${appId} filter: ${queryParams.toString()}, page_size: ${pageSize}`,

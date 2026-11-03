@@ -1,3 +1,5 @@
 - Updated chokidar dependency to ^4.0.3 to remove vulnerable braces dependency (#11308).
 - Fixed an issue where the Firebase MCP server referred to `update_firebase_environment` instead of `firebase_update_environment`.
 - Updated the Crashlytics MCP `get_report` tool to dynamically validate report names via `listReports` and support optional time `granularity`
+- Added an optional `filterExpression` parameter to the Crashlytics MCP `list_events` and `get_report` tools to filter by custom keys. 
+- Fixed Crashlytics MCP filter validation rejecting web app version names without a build number. 
